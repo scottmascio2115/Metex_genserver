@@ -1,3 +1,5 @@
+require IEx;
+
 defmodule Metex.Worker do
   use GenServer
 
@@ -15,6 +17,14 @@ defmodule Metex.Worker do
 
   def get_temperature(location) do
     GenServer.call(@name, {:location, location})
+  end
+
+  def temperatures_of(cities) do
+    cities |> Enum.each(fn city ->
+      city |> get_temperature
+    end)
+
+    get_stats
   end
 
   def reset_stats do
@@ -56,7 +66,10 @@ defmodule Metex.Worker do
   ## Helper methods
 
   defp temperature_of(location) do
-    url_for(location) |> HTTPoison.get |> parse_response
+    location
+    |> url_for
+    |> HTTPoison.get
+    |> parse_response
   end
 
   defp url_for(location) do
