@@ -3,10 +3,8 @@ require IEx;
 defmodule Metex.Worker do
   use GenServer
 
-  @name MW
-
   def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, opts ++ [name: MW])
+    GenServer.start_link(__MODULE__, :ok, opts)
   end
 
   def init(:ok) do
@@ -15,28 +13,24 @@ defmodule Metex.Worker do
 
   ## Client code
 
-  def get_temperature(location) do
-    GenServer.call(@name, {:location, location})
+  def start(pid, {sender_pid, location}) do
+    GenServer.cast(sender_pid, temperature_of(location))
   end
 
-  def temperatures_of(cities) do
-    cities |> Enum.each(fn city ->
-      city |> get_temperature
-    end)
-
-    get_stats
+  def get_temperature(pid, location) do
+    GenServer.call(pid, {:location, location})
   end
 
-  def reset_stats do
-    GenServer.cast(@name, :reset_stats)
+  def reset_stats(pid) do
+    GenServer.cast(pid, :reset_stats)
   end
 
-  def get_stats do
-    GenServer.call(@name, :get_stats)
+  def get_stats(pid) do
+    GenServer.call(pid, :get_stats)
   end
 
-  def stop do
-    GenServer.cast(@name, :stop)
+  def stop(pid) do
+    GenServer.cast(pid, :stop)
   end
 
   ## Server code
