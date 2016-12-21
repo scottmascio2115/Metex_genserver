@@ -23,7 +23,13 @@ defmodule Metex.Coordinator do
 
   def handle_cast(:exit, state) do
     IO.puts(state[:container] |> Enum.sort |> Enum.join(", "))
+    GenServer.cast(self, :stop)
     {:noreply, state}
+  end
+
+  def handle_cast(:stop, stats) do
+    IO.puts "Metex.Coordinator terminated"
+    {:stop, :normal, stats}
   end
 end
 

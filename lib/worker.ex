@@ -54,6 +54,7 @@ defmodule Metex.Worker do
   end
 
   def handle_cast(:stop, stats) do
+    IO.puts "Metex.Worker terminated"
     {:stop, :normal, stats}
   end
 
